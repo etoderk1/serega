@@ -1,442 +1,423 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import ReactDOM from 'react-dom/client';
-import { Copy, Share2, Check, RefreshCw, Zap } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Серёга-Матик 3000</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Babel for in-browser compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-// --- CONSTANTS ---
-
-const PHRASES = [
-  "Серёга анальный дирижёр",
-  "Серёга заднеприводный алхимик",
-  "Серёга ректальный астроном",
-  "Серёга проктологический гений",
-  "Серёга сфинктерный философ",
-  "Серёга кишечный изобретатель",
-  "Серёга геморроидальный поэт",
-  "Серёга подхвостный математик",
-  "Серёга анально‑квантовый физик",
-  "Серёга заднепроходный химик",
-  "Серёга ректально‑космический инженер",
-  "Серёга прокто‑биолог",
-  "Серёга сфинктерно‑исторический аналитик",
-  "Серёга кишечно‑философский мыслитель",
-  "Серёга геморройно‑литературный критик",
-  "Серёга подхвостово‑экономический эксперт",
-  "Серёга анально‑политический стратег",
-  "Серёга заднепроходно‑юридический консультант",
-  "Серёга ректально‑медицинский диагност",
-  "Серёга прокто‑технологический инноватор",
-  "Серёга сфинктерно‑архитектурный проектировщик",
-  "Серёга кишечно‑музыкальный композитор",
-  "Серёга геморройно‑художественный критик",
-  "Серёга подхвостово‑лингвистический переводчик",
-  "Серёга анально‑экологический активист",
-  "Серёга заднепроходно‑социологический исследователь",
-  "Серёга ректально‑психологический терапевт",
-  "Серёга прокто‑антропологический учёный",
-  "Серёга сфинктерно‑археологический раскопочник",
-  "Серёга кишечно‑географический путешественник",
-  "Серёга геморройно‑метеорологический прогнозист",
-  "Серёга подхвостово‑астрологический предсказатель",
-  "Серёга анально‑нумерологический аналитик",
-  "Серёга заднепроходно‑тарологический консультант",
-  "Серёга ректально‑эзотерический мудрец",
-  "Серёга прокто‑мифологический рассказчик",
-  "Серёга сфинктерно‑фольклорный собиратель",
-  "Серёга кишечно‑мистический проводник",
-  "Серёга геморройно‑оккультный практик",
-  "Серёга подхвостово‑шаманский целитель",
-  "Серёга анально‑духовный наставник",
-  "Серёга заднепроходно‑кармический аналитик",
-  "Серёга ректально‑энергетический гармонизатор",
-  "Серёга прокто‑медитативный тренер",
-  "Серёга сфинктерно‑астральный путешественник",
-  "Серёга кишечно‑чакровый настройщик",
-  "Серёга геморройно‑биополевой оператор",
-  "Серёга подхвостово‑телепатический коммуникатор",
-  "Серёга анально‑экстрасенсорный диагност",
-  "Серёга заднепроходно‑психокинетический мастер",
-  "Серёга ректально‑левитационный инструктор",
-  "Серёга прокто‑ясновидящий провидец",
-  "Серёга сфинктерно‑ауральный настройщик",
-  "Серёга кишечно‑энергетический чистильщик",
-  "Серёга геморройно‑кармический балансировщик",
-  "Серёга подхвостово‑духовный коуч",
-  "Серёга анально‑трансцендентальный гуру",
-  "Серёга заднепроходно‑просветлённый мудрец",
-  "Серёга ректально‑осознанный практик",
-  "Серёга прокто‑просветительский лидер",
-  "Серёга сфинктерно‑трансформационный тренер",
-  "Серёга кишечно‑эволюционный наставник",
-  "Серёга геморройно‑пробуждённый учитель",
-  "Серёга подхвостово‑просветляющий коуч",
-  "Серёга анально‑духовно‑развивающий эксперт",
-  "Серёга заднепроходно‑самореализационный консультант",
-  "Серёга ректально‑личностный тренер",
-  "Серёга прокто‑мотивационный спикер",
-  "Серёга сфинктерно‑целеполагающий стратег",
-  "Серёга кишечно‑ресурсный аналитик",
-  "Серёга геморройно‑потенциальный разработчик",
-  "Серёга подхвостово‑амбициозный планировщик",
-  "Серёга анально‑результативный исполнитель",
-  "Серёга заднепроходно‑эффективный оптимизатор",
-  "Серёга ректально‑продуктивный менеджер",
-  "Серёга прокто‑системный аналитик",
-  "Серёга сфинктерно‑процессный инженер",
-  "Серёга кишечно‑операционный руководитель",
-  "Серёга геморройно‑проектный менеджер",
-  "Серёга подхвостово‑командный лидер",
-  "Серёга анально‑стратегический планировщик",
-  "Серёга заднепроходно‑тактический исполнитель",
-  "Серёга ректально‑аналитический мыслитель",
-  "Серёга прокто‑критический оценщик",
-  "Серёга сфинктерно‑оценочный эксперт",
-  "Серёга кишечно‑сравнительный аналитик",
-  "Серёга геморройно‑диагностический специалист",
-  "Серёга подхвостово‑исследовательский учёный",
-  "Серёга анально‑экспериментальный практик",
-  "Серёга заднепроходно‑инновационный разработчик",
-  "Серёга ректально‑технологический пионер",
-  "Серёга прокто‑цифровой визионер",
-  "Серёга сфинктерно‑виртуальный архитектор",
-  "Серёга кишечно‑кибернетический инженер",
-  "Серёга геморройно‑программный разработчик",
-  "Серёга подхвостово‑алгоритмический мыслитель",
-  "Серёга анально‑кодовый мастер",
-  "Серёга заднепроходно‑сетевой администратор",
-  "Серёга ректально‑серверный инженер",
-  "Серёга прокто‑облачный архитектор",
-  "Серёга сфинктерно‑мобильный разработчик",
-  "Серёга кишечно‑интерфейсный дизайнер",
-  "Серёга геморройно‑пользовательский аналитик",
-  "Серёга подхвостово‑опыт‑ориентированный проектировщик",
-  "Серёга анально‑эргономичный инженер",
-  "Серёга заднепроходно‑доступный специалист",
-  "Серёга ректально‑инклюзивный дизайнер",
-  "Серёга прокто‑универсальный разработчик",
-  "Серёга сфинктерно‑адаптивный инженер",
-  "Серёга кишечно‑гибкий практик",
-  "Серёга геморройно‑масштабируемый архитектор",
-  "Серёга подхвостово‑устойчивый инженер",
-  "Серёга анально‑надёжный разработчик",
-  "Серёга заднепроходно‑безопасный специалист",
-  "Серёга ректально‑защищённый проектировщик",
-  "Серёга прокто‑конфиденциальный аналитик",
-  "Серёга сфинктерно‑шифровальный инженер",
-  "Серёга кишечно‑криптографический мастер",
-  "Серёга геморройно‑блокчейновый разработчик",
-  "Серёга подхвостово‑децентрализованный архитектор",
-  "Серёга анально‑токеновый инженер",
-  "Серёга заднепроходно‑смарт‑контрактный разработчик",
-  "Серёга ректально‑дефи‑специалист",
-  "Серёга прокто‑веб‑3‑визионер",
-  "Серёга сфинктерно‑метавселенский архитектор"
-];
-
-// --- COMPONENTS ---
-
-// 1. Button
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary';
-  fullWidth?: boolean;
-}
-
-const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  variant = 'primary', 
-  fullWidth = false,
-  className = '',
-  ...props 
-}) => {
-  const baseStyle = "font-mono uppercase font-bold text-lg py-4 px-8 border-2 transition-all duration-100 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
-  
-  const variants = {
-    primary: "bg-toxic text-black border-toxic hover:bg-transparent hover:text-toxic shadow-[0_0_15px_rgba(204,255,0,0.5)] hover:shadow-[0_0_25px_rgba(204,255,0,0.8)]",
-    secondary: "bg-transparent text-white border-white/20 hover:border-white hover:bg-white/10",
-  };
-
-  return (
-    <button 
-      className={`${baseStyle} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
-// 2. Marquee
-interface MarqueeProps {
-  items: string[];
-  direction?: 'left' | 'right';
-  speed?: number;
-}
-
-const Marquee: React.FC<MarqueeProps> = ({ items, direction = 'left', speed = 20 }) => {
-  return (
-    <div className="relative flex overflow-hidden py-4 opacity-20 select-none pointer-events-none">
-      <div 
-        className={`flex whitespace-nowrap animate-marquee ${direction === 'right' ? 'animate-marquee-reverse' : ''}`}
-        style={{ animationDuration: `${speed}s` }}
-      >
-        {items.map((item, i) => (
-          <span key={i} className="mx-8 text-xl font-mono text-toxic uppercase">
-            {item}
-          </span>
-        ))}
-      </div>
-      <div 
-        className={`absolute top-0 flex whitespace-nowrap animate-marquee2 ${direction === 'right' ? 'animate-marquee2-reverse' : ''}`}
-        style={{ animationDuration: `${speed}s` }}
-      >
-        {items.map((item, i) => (
-          <span key={`dup-${i}`} className="mx-8 text-xl font-mono text-toxic uppercase">
-            {item}
-          </span>
-        ))}
-      </div>
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0%); }
-          100% { transform: translateX(-100%); }
-        }
-        @keyframes marquee2 {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(0%); }
-        }
-        @keyframes marquee-reverse {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(0%); }
-        }
-        @keyframes marquee2-reverse {
-          0% { transform: translateX(0%); }
-          100% { transform: translateX(100%); }
-        }
-        .animate-marquee { animation: marquee linear infinite; }
-        .animate-marquee2 { animation: marquee2 linear infinite; }
-        .animate-marquee-reverse { animation: marquee-reverse linear infinite; }
-        .animate-marquee2-reverse { animation: marquee2-reverse linear infinite; }
-      `}</style>
-    </div>
-  );
-};
-
-// 3. InsultCard
-interface InsultCardProps {
-  phrase: string;
-  isAnimating: boolean;
-}
-
-const InsultCard: React.FC<InsultCardProps> = ({ phrase, isAnimating }) => {
-  const [copied, setCopied] = useState(false);
-
-  const parts = phrase.split(' ');
-  const name = parts[0];
-  const rest = parts.slice(1).join(' ');
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(phrase);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Кто сегодня Серёга?',
-        text: phrase,
-        url: window.location.href,
-      }).catch(console.error);
-    } else {
-      handleCopy();
-    }
-  };
-
-  return (
-    <div className={`
-      relative w-full max-w-2xl bg-cardbg border-4 border-toxic 
-      p-8 md:p-12 shadow-[0_0_50px_rgba(204,255,0,0.1)]
-      transition-all duration-100
-      ${isAnimating ? 'scale-[0.98] opacity-80 blur-[2px]' : 'scale-100 opacity-100 blur-0'}
-    `}>
-      {/* Decorative corner elements */}
-      <div className="absolute top-0 left-0 w-4 h-4 bg-toxic" />
-      <div className="absolute top-0 right-0 w-4 h-4 bg-toxic" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 bg-toxic" />
-      <div className="absolute bottom-0 right-0 w-4 h-4 bg-toxic" />
-
-      {/* Label */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black px-4 border border-toxic/30 text-toxic/50 text-xs font-mono uppercase tracking-widest">
-        Identification Result
-      </div>
-
-      <div className="flex flex-col items-center justify-center min-h-[200px] text-center gap-4">
-        <h2 className="text-4xl md:text-6xl font-bold uppercase text-white tracking-tight leading-none">
-          {name}
-        </h2>
-        
-        <div className="w-full h-px bg-toxic/20 my-2" />
-        
-        <p className={`
-          text-2xl md:text-4xl font-bold uppercase text-toxic break-words leading-tight
-          ${isAnimating ? 'animate-pulse' : ''}
-        `}>
-          {rest || "..."}
-        </p>
-      </div>
-
-      {/* Actions */}
-      <div className="absolute bottom-4 right-4 flex gap-2">
-        <button 
-          onClick={handleCopy}
-          className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white"
-          title="Скопировать"
-        >
-          {copied ? <Check size={20} className="text-green-500" /> : <Copy size={20} />}
-        </button>
-        <button 
-          onClick={handleShare}
-          className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white"
-          title="Поделиться"
-        >
-          <Share2 size={20} />
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// --- MAIN APP ---
-
-const App: React.FC = () => {
-  const [currentPhrase, setCurrentPhrase] = useState<string>("Серёга кто?");
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [history, setHistory] = useState<string[]>([]);
-
-  const triggerHaptic = () => {
-    if (navigator.vibrate) navigator.vibrate(50);
-  };
-
-  const generatePhrase = useCallback(() => {
-    if (isGenerating) return;
-
-    setIsGenerating(true);
-    triggerHaptic();
-
-    let shuffles = 0;
-    const maxShuffles = 15;
-    const intervalTime = 80;
-
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * PHRASES.length);
-      setCurrentPhrase(PHRASES[randomIndex]);
-      shuffles++;
-
-      if (shuffles >= maxShuffles) {
-        clearInterval(interval);
-        const finalIndex = Math.floor(Math.random() * PHRASES.length);
-        const finalPhrase = PHRASES[finalIndex];
-        
-        setCurrentPhrase(finalPhrase);
-        setHistory(prev => [finalPhrase, ...prev].slice(0, 10)); 
-        setIsGenerating(false);
-        
-        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Russo One"', 'sans-serif'],
+              mono: ['"Roboto Mono"', 'monospace'],
+            },
+            colors: {
+              toxic: {
+                DEFAULT: '#ccff00',
+                dim: '#88aa00',
+              },
+              darkbg: '#0a0a0a',
+              cardbg: '#1a1a1a',
+            },
+            animation: {
+              'pulse-fast': 'pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+            },
+            keyframes: {
+              shake: {
+                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+              }
+            }
+          },
+        },
       }
-    }, intervalTime);
-  }, [isGenerating]);
+    </script>
+    <style>
+      body {
+        background-color: #050505;
+        color: #e5e5e5;
+        overflow-x: hidden;
+      }
+      .scanline {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 50;
+      }
+    </style>
+    
+    <!-- Import Map: FIXED versions to ensure React 18 compatibility -->
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.344.0?deps=react@18.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div class="scanline"></div>
+    
+    <!-- Main Script -->
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect, useCallback } from 'react';
+      import ReactDOM from 'react-dom/client';
+      import { Copy, Share2, Check, RefreshCw, Zap } from 'lucide-react';
 
-  useEffect(() => {
-    // Optional: Auto generate one on load
-  }, []);
+      // --- CONSTANTS ---
+      const PHRASES = [
+        "Серёга анальный дирижёр", "Серёга заднеприводный алхимик", "Серёга ректальный астроном", "Серёга проктологический гений",
+        "Серёга сфинктерный философ", "Серёга кишечный изобретатель", "Серёга геморроидальный поэт", "Серёга подхвостный математик",
+        "Серёга анально‑квантовый физик", "Серёга заднепроходный химик", "Серёга ректально‑космический инженер", "Серёга прокто‑биолог",
+        "Серёга сфинктерно‑исторический аналитик", "Серёга кишечно‑философский мыслитель", "Серёга геморройно‑литературный критик",
+        "Серёга подхвостово‑экономический эксперт", "Серёга анально‑политический стратег", "Серёга заднепроходно‑юридический консультант",
+        "Серёга ректально‑медицинский диагност", "Серёга прокто‑технологический инноватор", "Серёга сфинктерно‑архитектурный проектировщик",
+        "Серёга кишечно‑музыкальный композитор", "Серёга геморройно‑художественный критик", "Серёга подхвостово‑лингвистический переводчик",
+        "Серёга анально‑экологический активист", "Серёга заднепроходно‑социологический исследователь", "Серёга ректально‑психологический терапевт",
+        "Серёга прокто‑антропологический учёный", "Серёга сфинктерно‑археологический раскопочник", "Серёга кишечно‑географический путешественник",
+        "Серёга геморройно‑метеорологический прогнозист", "Серёга подхвостово‑астрологический предсказатель", "Серёга анально‑нумерологический аналитик",
+        "Серёга заднепроходно‑тарологический консультант", "Серёга ректально‑эзотерический мудрец", "Серёга прокто‑мифологический рассказчик",
+        "Серёга сфинктерно‑фольклорный собиратель", "Серёга кишечно‑мистический проводник", "Серёга геморройно‑оккультный практик",
+        "Серёга подхвостово‑шаманский целитель", "Серёга анально‑духовный наставник", "Серёга заднепроходно‑кармический аналитик",
+        "Серёга ректально‑энергетический гармонизатор", "Серёга прокто‑медитативный тренер", "Серёга сфинктерно‑астральный путешественник",
+        "Серёга кишечно‑чакровый настройщик", "Серёга геморройно‑биополевой оператор", "Серёга подхвостово‑телепатический коммуникатор",
+        "Серёга анально‑экстрасенсорный диагност", "Серёга заднепроходно‑психокинетический мастер", "Серёга ректально‑левитационный инструктор",
+        "Серёга прокто‑ясновидящий провидец", "Серёга сфинктерно‑ауральный настройщик", "Серёга кишечно‑энергетический чистильщик",
+        "Серёга геморройно‑кармический балансировщик", "Серёга подхвостово‑духовный коуч", "Серёга анально‑трансцендентальный гуру",
+        "Серёга заднепроходно‑просветлённый мудрец", "Серёга ректально‑осознанный практик", "Серёга прокто‑просветительский лидер",
+        "Серёга сфинктерно‑трансформационный тренер", "Серёга кишечно‑эволюционный наставник", "Серёга геморройно‑пробуждённый учитель",
+        "Серёга подхвостово‑просветляющий коуч", "Серёга анально‑духовно‑развивающий эксперт", "Серёга заднепроходно‑самореализационный консультант",
+        "Серёга ректально‑личностный тренер", "Серёга прокто‑мотивационный спикер", "Серёга сфинктерно‑целеполагающий стратег",
+        "Серёга кишечно‑ресурсный аналитик", "Серёга геморройно‑потенциальный разработчик", "Серёга подхвостово‑амбициозный планировщик",
+        "Серёга анально‑результативный исполнитель", "Серёга заднепроходно‑эффективный оптимизатор", "Серёга ректально‑продуктивный менеджер",
+        "Серёга прокто‑системный аналитик", "Серёга сфинктерно‑процессный инженер", "Серёга кишечно‑операционный руководитель",
+        "Серёга геморройно‑проектный менеджер", "Серёга подхвостово‑командный лидер", "Серёга анально‑стратегический планировщик",
+        "Серёга заднепроходно‑тактический исполнитель", "Серёга ректально‑аналитический мыслитель", "Серёга прокто‑критический оценщик",
+        "Серёга сфинктерно‑оценочный эксперт", "Серёга кишечно‑сравнительный аналитик", "Серёга геморройно‑диагностический специалист",
+        "Серёга подхвостово‑исследовательский учёный", "Серёга анально‑экспериментальный практик", "Серёга заднепроходно‑инновационный разработчик",
+        "Серёга ректально‑технологический пионер", "Серёга прокто‑цифровой визионер", "Серёга сфинктерно‑виртуальный архитектор",
+        "Серёга кишечно‑кибернетический инженер", "Серёга геморройно‑программный разработчик", "Серёга подхвостово‑алгоритмический мыслитель",
+        "Серёга анально‑кодовый мастер", "Серёга заднепроходно‑сетевой администратор", "Серёга ректально‑серверный инженер",
+        "Серёга прокто‑облачный архитектор", "Серёга сфинктерно‑мобильный разработчик", "Серёга кишечно‑интерфейсный дизайнер",
+        "Серёга геморройно‑пользовательский аналитик", "Серёга подхвостово‑опыт‑ориентированный проектировщик", "Серёга анально‑эргономичный инженер",
+        "Серёга заднепроходно‑доступный специалист", "Серёга ректально‑инклюзивный дизайнер", "Серёга прокто‑универсальный разработчик",
+        "Серёга сфинктерно‑адаптивный инженер", "Серёга кишечно‑гибкий практик", "Серёга геморройно‑масштабируемый архитектор",
+        "Серёга подхвостово‑устойчивый инженер", "Серёга анально‑надёжный разработчик", "Серёга заднепроходно‑безопасный специалист",
+        "Серёга ректально‑защищённый проектировщик", "Серёга прокто‑конфиденциальный аналитик", "Серёга сфинктерно‑шифровальный инженер",
+        "Серёга кишечно‑криптографический мастер", "Серёга геморройно‑блокчейновый разработчик", "Серёга подхвостово‑децентрализованный архитектор",
+        "Серёга анально‑токеновый инженер", "Серёга заднепроходно‑смарт‑контрактный разработчик", "Серёга ректально‑дефи‑специалист",
+        "Серёга прокто‑веб‑3‑визионер", "Серёга сфинктерно‑метавселенский архитектор"
+      ];
 
-  return (
-    <div className="min-h-screen bg-darkbg text-white font-sans flex flex-col relative overflow-hidden">
-      
-      {/* Background Ambience */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-toxic/5 via-darkbg to-darkbg pointer-events-none" />
-      
-      {/* Dynamic Marquee Background */}
-      <div className="absolute inset-0 flex flex-col justify-between opacity-30 pointer-events-none z-0">
-        <Marquee items={PHRASES.slice(0, 20)} speed={40} />
-        <Marquee items={PHRASES.slice(20, 40)} direction="right" speed={35} />
-        <Marquee items={PHRASES.slice(40, 60)} speed={45} />
-        <Marquee items={PHRASES.slice(60, 80)} direction="right" speed={30} />
-      </div>
+      // --- COMPONENTS ---
 
-      {/* Main Content */}
-      <main className="flex-grow flex flex-col items-center justify-center p-4 z-10 relative">
+      // 1. Button
+      const Button = ({ 
+        children, 
+        variant = 'primary', 
+        fullWidth = false,
+        className = '',
+        ...props 
+      }) => {
+        const baseStyle = "font-mono uppercase font-bold text-lg py-4 px-8 border-2 transition-all duration-100 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
         
-        {/* Header */}
-        <header className="mb-12 text-center">
-          <div className="inline-flex items-center gap-2 border border-toxic/50 px-3 py-1 rounded-full mb-4 bg-toxic/5">
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            <span className="text-xs font-mono text-toxic uppercase tracking-widest">System Online</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-            СЕРЁГА<span className="text-toxic">-МАТИК</span>
-          </h1>
-          <p className="font-mono text-white/50 mt-2 text-sm md:text-base">
-            Quantum Identification System v3.0
-          </p>
-        </header>
+        const variants = {
+          primary: "bg-toxic text-black border-toxic hover:bg-transparent hover:text-toxic shadow-[0_0_15px_rgba(204,255,0,0.5)] hover:shadow-[0_0_25px_rgba(204,255,0,0.8)]",
+          secondary: "bg-transparent text-white border-white/20 hover:border-white hover:bg-white/10",
+        };
 
-        {/* Generator Card */}
-        <div className="w-full flex flex-col items-center gap-8 mb-12">
-          <InsultCard phrase={currentPhrase} isAnimating={isGenerating} />
-          
-          <Button 
-            onClick={generatePhrase} 
-            disabled={isGenerating}
-            className="group relative overflow-hidden min-w-[300px]"
+        return (
+          <button 
+            className={`${baseStyle} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+            {...props}
           >
-            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-            <span className="relative flex items-center justify-center gap-2">
-              {isGenerating ? (
-                <RefreshCw className="animate-spin" />
-              ) : (
-                <Zap className="group-hover:text-black transition-colors" />
-              )}
-              {isGenerating ? "ВЫЧИСЛЕНИЕ..." : "КТО СЕРЁГА?"}
-            </span>
-          </Button>
-        </div>
+            {children}
+          </button>
+        );
+      };
 
-        {/* Recent History */}
-        {history.length > 0 && (
-          <div className="w-full max-w-2xl mt-8">
-            <h3 className="text-xs font-mono text-white/30 uppercase mb-4 text-center">Недавние идентификации</h3>
-            <div className="flex flex-wrap justify-center gap-2">
-              {history.slice(0, 3).map((item, idx) => (
-                <span key={idx} className="bg-white/5 border border-white/10 px-3 py-1 rounded text-xs text-white/70">
+      // 2. Marquee
+      const Marquee = ({ items, direction = 'left', speed = 20 }) => {
+        return (
+          <div className="relative flex overflow-hidden py-4 opacity-20 select-none pointer-events-none">
+            <div 
+              className={`flex whitespace-nowrap animate-marquee ${direction === 'right' ? 'animate-marquee-reverse' : ''}`}
+              style={{ animationDuration: `${speed}s` }}
+            >
+              {items.map((item, i) => (
+                <span key={i} className="mx-8 text-xl font-mono text-toxic uppercase">
                   {item}
                 </span>
               ))}
             </div>
+            <div 
+              className={`absolute top-0 flex whitespace-nowrap animate-marquee2 ${direction === 'right' ? 'animate-marquee2-reverse' : ''}`}
+              style={{ animationDuration: `${speed}s` }}
+            >
+              {items.map((item, i) => (
+                <span key={`dup-${i}`} className="mx-8 text-xl font-mono text-toxic uppercase">
+                  {item}
+                </span>
+              ))}
+            </div>
+            <style>{`
+              @keyframes marquee {
+                0% { transform: translateX(0%); }
+                100% { transform: translateX(-100%); }
+              }
+              @keyframes marquee2 {
+                0% { transform: translateX(100%); }
+                100% { transform: translateX(0%); }
+              }
+              @keyframes marquee-reverse {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(0%); }
+              }
+              @keyframes marquee2-reverse {
+                0% { transform: translateX(0%); }
+                100% { transform: translateX(100%); }
+              }
+              .animate-marquee { animation: marquee linear infinite; }
+              .animate-marquee2 { animation: marquee2 linear infinite; }
+              .animate-marquee-reverse { animation: marquee-reverse linear infinite; }
+              .animate-marquee2-reverse { animation: marquee2-reverse linear infinite; }
+            `}</style>
           </div>
-        )}
+        );
+      };
 
-      </main>
+      // 3. InsultCard
+      const InsultCard = ({ phrase, isAnimating }) => {
+        const [copied, setCopied] = useState(false);
 
-      {/* Footer */}
-      <footer className="p-4 text-center z-10">
-        <p className="text-white/20 text-xs font-mono">
-          ПРЕДУПРЕЖДЕНИЕ: Только для Серёг. Использование на других именах может вызвать коллапс реальности.
-        </p>
-      </footer>
-    </div>
-  );
-};
+        const parts = phrase.split(' ');
+        const name = parts[0];
+        const rest = parts.slice(1).join(' ');
 
-// --- RENDER ---
+        const handleCopy = () => {
+          navigator.clipboard.writeText(phrase);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        };
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
+        const handleShare = () => {
+          if (navigator.share) {
+            navigator.share({
+              title: 'Кто сегодня Серёга?',
+              text: phrase,
+              url: window.location.href,
+            }).catch(console.error);
+          } else {
+            handleCopy();
+          }
+        };
 
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+        return (
+          <div className={`
+            relative w-full max-w-2xl bg-cardbg border-4 border-toxic 
+            p-8 md:p-12 shadow-[0_0_50px_rgba(204,255,0,0.1)]
+            transition-all duration-100
+            ${isAnimating ? 'scale-[0.98] opacity-80 blur-[2px]' : 'scale-100 opacity-100 blur-0'}
+          `}>
+            {/* Decorative corner elements */}
+            <div className="absolute top-0 left-0 w-4 h-4 bg-toxic" />
+            <div className="absolute top-0 right-0 w-4 h-4 bg-toxic" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 bg-toxic" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 bg-toxic" />
+
+            {/* Label */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black px-4 border border-toxic/30 text-toxic/50 text-xs font-mono uppercase tracking-widest">
+              Identification Result
+            </div>
+
+            <div className="flex flex-col items-center justify-center min-h-[200px] text-center gap-4">
+              <h2 className="text-4xl md:text-6xl font-bold uppercase text-white tracking-tight leading-none">
+                {name}
+              </h2>
+              
+              <div className="w-full h-px bg-toxic/20 my-2" />
+              
+              <p className={`
+                text-2xl md:text-4xl font-bold uppercase text-toxic break-words leading-tight
+                ${isAnimating ? 'animate-pulse' : ''}
+              `}>
+                {rest || "..."}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="absolute bottom-4 right-4 flex gap-2">
+              <button 
+                onClick={handleCopy}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white"
+                title="Скопировать"
+              >
+                {copied ? <Check size={20} className="text-green-500" /> : <Copy size={20} />}
+              </button>
+              <button 
+                onClick={handleShare}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white"
+                title="Поделиться"
+              >
+                <Share2 size={20} />
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      // --- MAIN APP ---
+
+      const App = () => {
+        const [currentPhrase, setCurrentPhrase] = useState("Серёга кто?");
+        const [isGenerating, setIsGenerating] = useState(false);
+        const [history, setHistory] = useState([]);
+
+        const triggerHaptic = () => {
+          if (navigator.vibrate) navigator.vibrate(50);
+        };
+
+        const generatePhrase = useCallback(() => {
+          if (isGenerating) return;
+
+          setIsGenerating(true);
+          triggerHaptic();
+
+          let shuffles = 0;
+          const maxShuffles = 15;
+          const intervalTime = 80;
+
+          const interval = setInterval(() => {
+            const randomIndex = Math.floor(Math.random() * PHRASES.length);
+            setCurrentPhrase(PHRASES[randomIndex]);
+            shuffles++;
+
+            if (shuffles >= maxShuffles) {
+              clearInterval(interval);
+              const finalIndex = Math.floor(Math.random() * PHRASES.length);
+              const finalPhrase = PHRASES[finalIndex];
+              
+              setCurrentPhrase(finalPhrase);
+              setHistory(prev => [finalPhrase, ...prev].slice(0, 10)); 
+              setIsGenerating(false);
+              
+              if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            }
+          }, intervalTime);
+        }, [isGenerating]);
+
+        return (
+          <div className="min-h-screen bg-darkbg text-white font-sans flex flex-col relative overflow-hidden">
+            
+            {/* Background Ambience */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-toxic/5 via-darkbg to-darkbg pointer-events-none" />
+            
+            {/* Dynamic Marquee Background */}
+            <div className="absolute inset-0 flex flex-col justify-between opacity-30 pointer-events-none z-0">
+              <Marquee items={PHRASES.slice(0, 20)} speed={40} />
+              <Marquee items={PHRASES.slice(20, 40)} direction="right" speed={35} />
+              <Marquee items={PHRASES.slice(40, 60)} speed={45} />
+              <Marquee items={PHRASES.slice(60, 80)} direction="right" speed={30} />
+            </div>
+
+            {/* Main Content */}
+            <main className="flex-grow flex flex-col items-center justify-center p-4 z-10 relative">
+              
+              {/* Header */}
+              <header className="mb-12 text-center">
+                <div className="inline-flex items-center gap-2 border border-toxic/50 px-3 py-1 rounded-full mb-4 bg-toxic/5">
+                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                  <span className="text-xs font-mono text-toxic uppercase tracking-widest">System Online</span>
+                </div>
+                <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                  СЕРЁГА<span className="text-toxic">-МАТИК</span>
+                </h1>
+                <p className="font-mono text-white/50 mt-2 text-sm md:text-base">
+                  Quantum Identification System v3.0
+                </p>
+              </header>
+
+              {/* Generator Card */}
+              <div className="w-full flex flex-col items-center gap-8 mb-12">
+                <InsultCard phrase={currentPhrase} isAnimating={isGenerating} />
+                
+                <Button 
+                  onClick={generatePhrase} 
+                  disabled={isGenerating}
+                  className="group relative overflow-hidden min-w-[300px]"
+                >
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  <span className="relative flex items-center justify-center gap-2">
+                    {isGenerating ? (
+                      <RefreshCw className="animate-spin" />
+                    ) : (
+                      <Zap className="group-hover:text-black transition-colors" />
+                    )}
+                    {isGenerating ? "ВЫЧИСЛЕНИЕ..." : "КТО СЕРЁГА?"}
+                  </span>
+                </Button>
+              </div>
+
+              {/* Recent History */}
+              {history.length > 0 && (
+                <div className="w-full max-w-2xl mt-8">
+                  <h3 className="text-xs font-mono text-white/30 uppercase mb-4 text-center">Недавние идентификации</h3>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {history.slice(0, 3).map((item, idx) => (
+                      <span key={idx} className="bg-white/5 border border-white/10 px-3 py-1 rounded text-xs text-white/70">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </main>
+
+            {/* Footer */}
+            <footer className="p-4 text-center z-10">
+              <p className="text-white/20 text-xs font-mono">
+                ПРЕДУПРЕЖДЕНИЕ: Только для Серёг. Использование на других именах может вызвать коллапс реальности.
+              </p>
+            </footer>
+          </div>
+        );
+      };
+
+      // --- RENDER ---
+      const rootElement = document.getElementById('root');
+      if (!rootElement) {
+        throw new Error("Could not find root element to mount to");
+      }
+
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    </script>
+  </body>
+</html>
